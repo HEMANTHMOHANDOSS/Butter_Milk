@@ -42,99 +42,22 @@ Balvikas boys - ${report.bv_boys}
 May Swami shower His blessings on all 🎊`;
 
   useEffect(() => {
-    const generateCollage = async () => {
+    const loadCollage = async () => {
       const canvas = canvasRef.current;
       if (!canvas) return;
       const ctx = canvas.getContext('2d');
-      if (!ctx) return;
+      if (!ctx || !report.photos[0]) return;
 
-      const width = 1080;
-      const height = 1350; // Instagram Portrait Aspect Ratio
-      canvas.width = width;
-      canvas.height = height;
-
-      // Background
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, width, height);
-
-      // Draw Photos
-      const photos = report.photos.slice(0, 5);
-      const photoCount = photos.length;
-
-      const drawImage = (src: string, x: number, y: number, w: number, h: number) => {
-        return new Promise<void>((resolve) => {
-          const img = new Image();
-          img.onload = () => {
-             // Center crop
-             const imgRatio = img.width / img.height;
-             const targetRatio = w / h;
-             let sx, sy, sw, sh;
-             if (imgRatio > targetRatio) {
-               sh = img.height;
-               sw = img.height * targetRatio;
-               sx = (img.width - sw) / 2;
-               sy = 0;
-             } else {
-               sw = img.width;
-               sh = img.width / targetRatio;
-               sx = 0;
-               sy = (img.height - sh) / 2;
-             }
-             ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h);
-             resolve();
-          };
-          img.src = src;
-        });
+      const img = new Image();
+      img.onload = () => {
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+        setGenerating(false);
       };
-
-      // Layouts based on count
-      if (photoCount === 1) {
-        await drawImage(photos[0], 0, 100, width, height - 200);
-      } else if (photoCount === 2) {
-        await drawImage(photos[0], 0, 100, width / 2 - 2, height - 200);
-        await drawImage(photos[1], width / 2 + 2, 100, width / 2 - 2, height - 200);
-      } else if (photoCount === 3) {
-        await drawImage(photos[0], 0, 100, width, (height - 200) / 2 - 2);
-        await drawImage(photos[1], 0, 100 + (height - 200) / 2 + 2, width / 2 - 2, (height - 200) / 2 - 2);
-        await drawImage(photos[2], width / 2 + 2, 100 + (height - 200) / 2 + 2, width / 2 - 2, (height - 200) / 2 - 2);
-      } else if (photoCount === 4) {
-        await drawImage(photos[0], 0, 100, width / 2 - 2, (height - 200) / 2 - 2);
-        await drawImage(photos[1], width / 2 + 2, 100, width / 2 - 2, (height - 200) / 2 - 2);
-        await drawImage(photos[2], 0, 100 + (height - 200) / 2 + 2, width / 2 - 2, (height - 200) / 2 - 2);
-        await drawImage(photos[3], width / 2 + 2, 100 + (height - 200) / 2 + 2, width / 2 - 2, (height - 200) / 2 - 2);
-      } else if (photoCount === 5) {
-        const topH = (height - 200) * 0.6;
-        const botH = (height - 200) * 0.4;
-        await drawImage(photos[0], 0, 100, width / 2 - 2, topH - 2);
-        await drawImage(photos[1], width / 2 + 2, 100, width / 2 - 2, topH - 2);
-        await drawImage(photos[2], 0, 100 + topH + 2, width / 3 - 2, botH - 2);
-        await drawImage(photos[3], width / 3 + 2, 100 + topH + 2, width / 3 - 2, botH - 2);
-        await drawImage(photos[4], (width / 3) * 2 + 2, 100 + topH + 2, width / 3 - 2, botH - 2);
-      }
-
-      // Add Headers & Footers
-      ctx.fillStyle = 'rgba(92, 98, 214, 0.9)';
-      ctx.fillRect(0, 0, width, 100);
-      
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 36px Arial';
-      ctx.textAlign = 'center';
-      ctx.fillText('Sri Sathya Sai Butter Milk Distribution', width / 2, 45);
-      ctx.font = '30px Arial';
-      ctx.fillText('Parvathy Nagar Samithi', width / 2, 85);
-
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-      ctx.fillRect(0, height - 80, width, 80);
-
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 32px Arial';
-      ctx.textAlign = 'center';
-      ctx.fillText(new Date(report.date).toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }), width / 2, height - 30);
-
-      setGenerating(false);
+      img.src = report.photos[0];
     };
-
-    generateCollage();
+    loadCollage();
   }, [report]);
 
   const downloadCollage = () => {

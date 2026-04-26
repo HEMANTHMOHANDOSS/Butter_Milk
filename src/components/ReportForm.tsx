@@ -74,21 +74,114 @@ export default function ReportForm({ onSuccess }: ReportFormProps) {
     setPhotos(prev => prev.filter((_, i) => i !== index));
   };
 
+  const generateCollage = async (images: string[], date: string): Promise<string> => {
+    return new Promise((resolve) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return resolve('');
+
+      const width = 1080;
+      const height = 1350;
+      canvas.width = width;
+      canvas.height = height;
+
+      // Background
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, width, height);
+
+      const drawImage = (src: string, x: number, y: number, w: number, h: number) => {
+        return new Promise<void>((res) => {
+          const img = new Image();
+          img.onload = () => {
+            const imgRatio = img.width / img.height;
+            const targetRatio = w / h;
+            let sx, sy, sw, sh;
+            if (imgRatio > targetRatio) {
+              sh = img.height;
+              sw = img.height * targetRatio;
+              sx = (img.width - sw) / 2;
+              sy = 0;
+            } else {
+              sw = img.width;
+              sh = img.width / targetRatio;
+              sx = 0;
+              sy = (img.height - sh) / 2;
+            }
+            ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h);
+            res();
+          };
+          img.src = src;
+        });
+      };
+
+      const photoCount = images.length;
+      const run = async () => {
+        if (photoCount === 1) await drawImage(images[0], 0, 100, width, height - 200);
+        else if (photoCount === 2) {
+          await drawImage(images[0], 0, 100, width / 2 - 2, height - 200);
+          await drawImage(images[1], width / 2 + 2, 100, width / 2 - 2, height - 200);
+        } else if (photoCount === 3) {
+          await drawImage(images[0], 0, 100, width, (height - 200) / 2 - 2);
+          await drawImage(images[1], 0, 100 + (height - 200) / 2 + 2, width / 2 - 2, (height - 200) / 2 - 2);
+          await drawImage(images[2], width / 2 + 2, 100 + (height - 200) / 2 + 2, width / 2 - 2, (height - 200) / 2 - 2);
+        } else if (photoCount === 4) {
+          await drawImage(images[0], 0, 100, width / 2 - 2, (height - 200) / 2 - 2);
+          await drawImage(images[1], width / 2 + 2, 100, width / 2 - 2, (height - 200) / 2 - 2);
+          await drawImage(images[2], 0, 100 + (height - 200) / 2 + 2, width / 2 - 2, (height - 200) / 2 - 2);
+          await drawImage(images[3], width / 2 + 2, 100 + (height - 200) / 2 + 2, width / 2 - 2, (height - 200) / 2 - 2);
+        } else if (photoCount === 5) {
+          const topH = (height - 200) * 0.6;
+          const botH = (height - 200) * 0.4;
+          await drawImage(images[0], 0, 100, width / 2 - 2, topH - 2);
+          await drawImage(images[1], width / 2 + 2, 100, width / 2 - 2, topH - 2);
+          await drawImage(images[2], 0, 100 + topH + 2, width / 3 - 2, botH - 2);
+          await drawImage(images[3], width / 3 + 2, 100 + topH + 2, width / 3 - 2, botH - 2);
+          await drawImage(images[4], (width / 3) * 2 + 2, 100 + topH + 2, width / 3 - 2, botH - 2);
+        }
+
+        // Branding
+        ctx.fillStyle = 'rgba(92, 98, 214, 0.9)';
+        ctx.fillRect(0, 0, width, 100);
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 36px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('Sri Sathya Sai Butter Milk Distribution', width / 2, 45);
+        ctx.font = '30px Arial';
+        ctx.fillText('Parvathy Nagar Samithi', width / 2, 85);
+
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+        ctx.fillRect(0, height - 80, width, 80);
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 32px Arial';
+        ctx.fillText(new Date(date).toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }), width / 2, height - 30);
+
+        resolve(canvas.toDataURL('image/jpeg', 0.8));
+      };
+      run();
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (photos.length === 0) {
+      alert('Please upload at least one photo');
+      return;
+    }
     setLoading(true);
 
-    const payload = {
-      ...formData,
-      mahilas: parseInt(formData.mahilas as string) || 0,
-      gents: parseInt(formData.gents as string) || 0,
-      bv_girls: parseInt(formData.bv_girls as string) || 0,
-      bv_boys: parseInt(formData.bv_boys as string) || 0,
-      beneficiary_count: parseInt(formData.beneficiary_count as string) || 0,
-      photos
-    };
-
     try {
+      const collage = await generateCollage(photos, formData.date);
+
+      const payload = {
+        ...formData,
+        mahilas: parseInt(formData.mahilas as string) || 0,
+        gents: parseInt(formData.gents as string) || 0,
+        bv_girls: parseInt(formData.bv_girls as string) || 0,
+        bv_boys: parseInt(formData.bv_boys as string) || 0,
+        beneficiary_count: parseInt(formData.beneficiary_count as string) || 0,
+        photos: [collage] // Store only the collage
+      };
+
       const res = await fetch('/api/reports', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
