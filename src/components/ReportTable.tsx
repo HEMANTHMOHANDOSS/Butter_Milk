@@ -139,7 +139,7 @@ export default function ReportTable({ reports, onDelete }: ReportTableProps) {
             </AnimatePresence>
             {reports.length === 0 && (
               <tr>
-                <td colSpan={5} style={{ textAlign: 'center', py: '3rem', color: 'var(--text-muted)' }}>
+                <td colSpan={5} style={{ textAlign: 'center', paddingTop: '3rem', paddingBottom: '3rem', color: 'var(--text-muted)' }}>
                   No reports found. Start by adding one!
                 </td>
               </tr>
