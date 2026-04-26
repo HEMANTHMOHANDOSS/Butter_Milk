@@ -230,7 +230,7 @@ export default function ReportForm({ onSuccess }: ReportFormProps) {
         </div>
 
         <div style={{ marginTop: '2rem' }}>
-          <button type="submit" className="btn btn-primary" disabled={loading} style={{ width: '100%', py: '1rem' }}>
+          <button type="submit" className="btn btn-primary" disabled={loading} style={{ width: '100%', paddingTop: '1rem', paddingBottom: '1rem' }}>
             {loading ? 'Submitting...' : <><Send size={18} /> Submit Report</>}
           </button>
         </div>
