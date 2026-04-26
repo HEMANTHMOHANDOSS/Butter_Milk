@@ -32,20 +32,25 @@ export default function CollageGenerator({ report, onClose }: CollageGeneratorPr
     return n + (s[(v - 20) % 10] || s[v] || s[0]);
   };
 
-  const shareText = `Sairam 🙏
-By Swami’s grace, ${getOrdinal(report.day)} Day of Buttermilk Distribution at Parvathy Nagar Bus Stop. 🥛✨
+  const sevadhalLines = [
+    { label: '🌸 Mahilas', count: report.mahilas },
+    { label: '👔 Gents', count: report.gents },
+    { label: '👧 Balvikas Girls', count: report.bv_girls },
+    { label: '👦 Balvikas Boys', count: report.bv_boys }
+  ]
+    .filter(item => item.count > 0)
+    .map(item => `${item.label} - ${item.count}`)
+    .join('\n');
 
-Served around ${report.beneficiary_count} people. 🙌
+  const shareText = `✨ Sairam – Buttermilk Distribution ✨
+🗓 Date: ${new Date(report.date).toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+📍 Location: Parvathy Nagar Bus Stop
 
-🗓 ${new Date(report.date).toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+By Swami’s grace, Day ${report.day} of seva completed, serving around ${report.beneficiary_count} people. 🙌
 
-👥 Sevadhals Participated:
-🌸 Mahilas - ${report.mahilas} 
-👔 Gents - ${report.gents} 
-👧 Balvikas Girls - ${report.bv_girls}
-👦 Balvikas Boys - ${report.bv_boys}
+${sevadhalLines ? `👥 Sevadhals participated:\n${sevadhalLines}` : ''}
 
-May Swami shower His blessings on all! 🎊🙏`;
+May Swami bless all 🙏🥛`;
 
   useEffect(() => {
     const loadCollage = async () => {
