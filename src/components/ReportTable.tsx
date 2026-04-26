@@ -55,8 +55,15 @@ export default function ReportTable({ reports, onDelete }: ReportTableProps) {
     saveAs(blob, `ButterMilkReports_${new Date().toISOString().split('T')[0]}.xlsx`);
   };
 
-  const handleShare = (report: Report) => {
-    setShareReport(report);
+  const handleShare = async (report: Report) => {
+    try {
+      const res = await fetch(`/api/reports/${report.id}`);
+      const fullReport = await res.json();
+      setShareReport(fullReport);
+    } catch (err) {
+      console.error('Failed to fetch report photos:', err);
+      alert('Failed to load photos for sharing');
+    }
   };
 
   return (

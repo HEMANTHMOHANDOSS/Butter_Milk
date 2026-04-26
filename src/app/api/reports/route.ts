@@ -4,7 +4,8 @@ import { sql } from '@/lib/db';
 export async function GET() {
   try {
     const reports = await sql`
-      SELECT * FROM buttermilk_reports 
+      SELECT id, date, day, mahilas, gents, bv_girls, bv_boys, beneficiary_count, created_at 
+      FROM buttermilk_reports 
       ORDER BY date DESC, day DESC
     `;
     return NextResponse.json(reports);

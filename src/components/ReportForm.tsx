@@ -32,8 +32,39 @@ export default function ReportForm({ onSuccess }: ReportFormProps) {
 
     Array.from(files).forEach(file => {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setPhotos(prev => [...prev, reader.result as string]);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+
+          // Max resolution 1280px
+          const MAX_WIDTH = 1280;
+          const MAX_HEIGHT = 1280;
+
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height *= MAX_WIDTH / width;
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width *= MAX_HEIGHT / height;
+              height = MAX_HEIGHT;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+          
+          // Compress to 0.7 quality
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+          setPhotos(prev => [...prev, dataUrl]);
+        };
+        img.src = event.target?.result as string;
       };
       reader.readAsDataURL(file);
     });
