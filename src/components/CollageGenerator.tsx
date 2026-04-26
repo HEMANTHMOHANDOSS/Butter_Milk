@@ -32,14 +32,20 @@ export default function CollageGenerator({ report, onClose }: CollageGeneratorPr
     return n + (s[(v - 20) % 10] || s[v] || s[0]);
   };
 
-  const shareText = `Sairam 🙏 By Swami’s grace, ${getOrdinal(report.day)} day of buttermilk distribution at Parvathy Nagar bus stop, served around ${report.beneficiary_count} people.
-${new Date(report.date).toLocaleDateString()}
-Sevadhals participated
-Mahilas - ${report.mahilas} 
-Gents - ${report.gents} 
-Balvikas boys - ${report.bv_boys} 
+  const shareText = `Sairam 🙏
+By Swami’s grace, ${getOrdinal(report.day)} Day of Buttermilk Distribution at Parvathy Nagar Bus Stop. 🥛✨
 
-May Swami shower His blessings on all 🎊`;
+Served around ${report.beneficiary_count} people. 🙌
+
+🗓 ${new Date(report.date).toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+
+👥 Sevadhals Participated:
+🌸 Mahilas - ${report.mahilas} 
+👔 Gents - ${report.gents} 
+👧 Balvikas Girls - ${report.bv_girls}
+👦 Balvikas Boys - ${report.bv_boys}
+
+May Swami shower His blessings on all! 🎊🙏`;
 
   useEffect(() => {
     const loadCollage = async () => {
