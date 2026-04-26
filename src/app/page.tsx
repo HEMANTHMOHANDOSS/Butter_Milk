@@ -53,6 +53,13 @@ export default function Home() {
 
   return (
     <main className="container">
+      <div style={{ width: '100%', marginBottom: '2rem', borderRadius: '1.5rem', overflow: 'hidden', boxShadow: 'var(--shadow)' }}>
+        <img 
+          src="https://res.cloudinary.com/drk3vmrsc/image/upload/v1777214155/Capture_j5jofs.png" 
+          alt="Seva Banner" 
+          style={{ width: '100%', display: 'block' }}
+        />
+      </div>
       <header className="title-section">
         <motion.div
            initial={{ scale: 0.8, opacity: 0 }}
