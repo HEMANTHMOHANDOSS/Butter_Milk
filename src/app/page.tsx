@@ -6,8 +6,20 @@ import ReportForm from '@/components/ReportForm';
 import ReportTable from '@/components/ReportTable';
 import { Droplet } from 'lucide-react';
 
+interface Report {
+  id: number;
+  date: string;
+  day: number;
+  mahilas: number;
+  gents: number;
+  bv_girls: number;
+  bv_boys: number;
+  beneficiary_count: number;
+  photos: string[];
+}
+
 export default function Home() {
-  const [reports, setReports] = useState([]);
+  const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchReports = async () => {
